@@ -1,0 +1,7 @@
+Flask
+requests
+fastapi
+uvicorn
+httpx
+flake8
+pytest
