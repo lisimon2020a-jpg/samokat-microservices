@@ -1,1 +1,190 @@
-с
+openapi: 3.0.0
+info:
+  title: Samokat Microservices API
+  description: Спецификация API Gateway для сервиса доставки продуктов «Самокат».
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8000
+    description: Локальный API Gateway
+
+tags:
+  - name: Users
+    description: Управление пользователями (клиенты, курьеры, сборщики)
+  - name: Products
+    description: Каталог товаров и остатки
+  - name: Orders
+    description: Управление заказами
+
+paths:
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Получить список пользователей
+      description: Возвращает список всех зарегистрированных пользователей из `users_service`.
+      operationId: getUsers
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '503':
+          description: Сервис пользователей недоступен (упал `users_service`)
+
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Получить список товаров
+      description: Возвращает каталог товаров из `products_service`.
+      operationId: getProducts
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '503':
+          description: Сервис товаров недоступен
+
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: Получить список заказов
+      description: Возвращает историю всех оформленных заказов из `orders_service`.
+      operationId: getOrders
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '503':
+          description: Сервис заказов недоступен
+
+    post:
+      tags:
+        - Orders
+      summary: Создать новый заказ
+      description: Создает новый заказ в системе.
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+            example:
+              product_id: 101
+              user_id: 1
+              quantity: 2
+      responses:
+        '200':
+          description: Заказ успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '422':
+          description: Ошибка валидации данных (неверные типы)
+        '503':
+          description: Сервис заказов недоступен
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - phone
+        - role
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Иван"
+        phone:
+          type: string
+          example: "+79991112233"
+        role:
+          type: string
+          description: Роль пользователя в системе
+          enum: [customer, courier, picker, admin]
+          example: "customer"
+
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - stock
+      properties:
+        id:
+          type: integer
+          example: 101
+        name:
+          type: string
+          example: "Круассан с карамелью"
+        price:
+          type: number
+          format: float
+          example: 149.0
+        stock:
+          type: integer
+          description: Количество единиц на складе (в дарксторе)
+          example: 10
+
+    Order:
+      type: object
+      required:
+        - id
+        - product_id
+        - user_id
+        - quantity
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор заказа
+          example: 1
+        product_id:
+          type: integer
+          example: 101
+        user_id:
+          type: integer
+          example: 1
+        quantity:
+          type: integer
+          example: 2
+
+    OrderInput:
+      type: object
+      required:
+        - product_id
+        - user_id
+        - quantity
+      properties:
+        product_id:
+          type: integer
+          example: 101
+        user_id:
+          type: integer
+          example: 1
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
