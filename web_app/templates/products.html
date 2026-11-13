@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Товары</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Список товаров</h1>
+        {% if products %}
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Название</th><th>Цена</th><th>Остаток</th></tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.price }} ₽</td>
+                        <td>{{ p.stock }} шт.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Товары не найдены.</p>
+        {% endif %}
+        <a href="{{ url_for('index') }}" class="btn">← На главную</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Заказы</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление заказами</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <h2>Создать новый заказ</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label>ID товара:</label>
+                <input type="number" name="product_id" required min="1">
+            </div>
+            <div class="form-group">
+                <label>ID пользователя (клиента):</label>
+                <input type="number" name="user_id" required min="1">
+            </div>
+            <div class="form-group">
+                <label>Количество:</label>
+                <input type="number" name="quantity" required min="1">
+            </div>
+            <button type="submit" class="btn">Создать заказ</button>
+        </form>
+
+        <h2>Список заказов</h2>
+        {% if orders %}
+            <table>
+                <thead>
+                    <tr><th>ID заказа</th><th>ID товара</th><th>ID клиента</th><th>Кол-во</th></tr>
+                </thead>
+                <tbody>
+                    {% for o in orders %}
+                    <tr>
+                        <td>{{ o.id }}</td>
+                        <td>{{ o.product_id }}</td>
+                        <td>{{ o.user_id }}</td>
+                        <td>{{ o.quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Заказы отсутствуют.</p>
+        {% endif %}
+        <a href="{{ url_for('index') }}" class="btn">← На главную</a>
+    </div>
+</body>
+</html>

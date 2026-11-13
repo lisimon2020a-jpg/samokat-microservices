@@ -33,3 +33,12 @@ async def get_orders():
             return r.json()
     except Exception:
         raise HTTPException(status_code=503, detail="Orders service unavailable")
+
+@app.post("/orders")
+async def create_order(order: dict):
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.post(f"{ORDERS_URL}/orders", json=order)
+            return r.json()
+    except Exception:
+        raise HTTPException(status_code=503, detail="Orders service unavailable")
